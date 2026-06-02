@@ -12,6 +12,10 @@ const selected = new Set();
 function fmtInt(n) {
   return (n == null) ? "-" : Math.round(n).toLocaleString("en-US");
 }
+function fmtLots(shares) {
+  // 股數 → 張（1 張 = 1000 股）
+  return (shares == null) ? "-" : Math.round(shares / 1000).toLocaleString("en-US");
+}
 function fmtRate(r) {
   return (typeof r === "number") ? r.toFixed(2) + "%" : "-";
 }
@@ -137,6 +141,7 @@ function renderTable() {
       .forEach((h, i) => prevRank.set(h.code, i + 1));
   }
   const prevRate = new Map((prev ? prev.holdings : []).map((h) => [h.code, h.nav_rate]));
+  const prevShare = new Map((prev ? prev.holdings : []).map((h) => [h.code, h.share]));
 
   const rows = [...latest.holdings].sort((a, b) => (b.nav_rate ?? 0) - (a.nav_rate ?? 0));
   const tbody = document.querySelector("#holdingsTable tbody");
@@ -148,20 +153,30 @@ function renderTable() {
     const pr = prevRank.get(h.code);
     const dRank = pr ? (pr - rank) : null; // 正=排名上升
 
+    // 當日操作判定：新進場或股數增加=買(紅)、股數減少=賣(綠)、股數不變=不上色
+    let op = "flat";
+    if (!prevShare.has(h.code)) {
+      op = "buy";
+    } else {
+      const dShare = (h.share ?? 0) - (prevShare.get(h.code) ?? 0);
+      if (dShare > 0) op = "buy";
+      else if (dShare < 0) op = "sell";
+    }
+
     const rateCell = (dRate == null)
-      ? `<span class="up">新增</span>`
+      ? `<span class="${op}">新增</span>`
       : (Math.abs(dRate) < 0.005 ? `<span class="flat">—</span>`
-         : `<span class="${dRate > 0 ? "up" : "down"}">${dRate > 0 ? "▲" : "▼"} ${Math.abs(dRate).toFixed(2)}%</span>`);
+         : `<span class="${op}">${dRate > 0 ? "▲" : "▼"} ${Math.abs(dRate).toFixed(2)}%</span>`);
 
     const rankCell = (dRank == null)
-      ? `<span class="up">NEW</span>`
+      ? `<span class="${op}">NEW</span>`
       : (dRank === 0 ? `<span class="flat">—</span>`
-         : `<span class="${dRank > 0 ? "up" : "down"}">${dRank > 0 ? "▲" : "▼"} ${Math.abs(dRank)}</span>`);
+         : `<span class="${op}">${dRank > 0 ? "▲" : "▼"} ${Math.abs(dRank)}</span>`);
 
     const tr = document.createElement("tr");
     tr.innerHTML =
       `<td>${rank}</td><td>${h.name}</td><td>${h.code}</td>` +
-      `<td>${fmtRate(h.nav_rate)}</td><td>${rateCell}</td><td>${rankCell}</td><td>${fmtInt(h.share)}</td>`;
+      `<td>${fmtRate(h.nav_rate)}</td><td>${rateCell}</td><td>${rankCell}</td><td>${fmtLots(h.share)}</td>`;
     tbody.appendChild(tr);
   });
 }
