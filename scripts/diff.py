@@ -54,6 +54,7 @@ def compute_operations(snap: dict) -> dict:
                 "code": code,
                 "name": h["name"],
                 "share_change": d_share,
+                "share_to": h["share"],  # 當日總股數，供顯示「→ X張」
                 "nav_rate_from": b["nav_rate"],
                 "nav_rate_to": h["nav_rate"],
             }
