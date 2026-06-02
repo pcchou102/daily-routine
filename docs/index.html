@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>00981A 持股追蹤儀表板</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    :root { --bg:#0f1115; --card:#181b22; --fg:#e7e9ee; --muted:#9aa0ad; --up:#2ecc71; --down:#e74c3c; --line:#2a2f3a; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:"Microsoft JhengHei","微軟正黑體",system-ui,sans-serif; background:var(--bg); color:var(--fg); }
+    header { padding:20px 24px; border-bottom:1px solid var(--line); }
+    header h1 { margin:0; font-size:20px; }
+    header .sub { color:var(--muted); font-size:13px; margin-top:4px; }
+    main { padding:20px 24px; max-width:1100px; margin:0 auto; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px 18px; margin-bottom:20px; }
+    .card h2 { margin:0 0 12px; font-size:16px; }
+    .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    select, button { background:#222732; color:var(--fg); border:1px solid var(--line); border-radius:6px; padding:6px 10px; font-size:13px; }
+    .stock-picker { max-height:120px; overflow:auto; display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .chip { padding:4px 9px; border:1px solid var(--line); border-radius:14px; font-size:12px; cursor:pointer; user-select:none; color:var(--muted); }
+    .chip.active { background:#2d4a73; color:#fff; border-color:#3d6aa3; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th, td { padding:8px 10px; text-align:right; border-bottom:1px solid var(--line); }
+    th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align:left; }
+    th { color:var(--muted); font-weight:600; position:sticky; top:0; background:var(--card); }
+    .up { color:var(--up); } .down { color:var(--down); } .flat { color:var(--muted); }
+    .empty { color:var(--muted); padding:12px 0; }
+    .chartbox { position:relative; height:380px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📊 00981A 統一台股增長主動式ETF — 持股追蹤</h1>
+    <div class="sub" id="subtitle">載入中…</div>
+  </header>
+  <main>
+    <div class="card">
+      <h2>個股權重趨勢（占淨值比 %）</h2>
+      <div class="row">
+        <label>區間</label>
+        <select id="range">
+          <option value="0">全部</option>
+          <option value="30">近 30 個交易日</option>
+          <option value="90">近 90 個交易日</option>
+        </select>
+        <button id="top5">顯示權重前 5 大</button>
+        <button id="clear">清除</button>
+      </div>
+      <div class="stock-picker" id="picker"></div>
+      <div class="chartbox"><canvas id="chart"></canvas></div>
+    </div>
+
+    <div class="card">
+      <h2>最新持股 <span id="latestDate" class="sub"></span></h2>
+      <div style="max-height:520px; overflow:auto;">
+        <table id="holdingsTable">
+          <thead>
+            <tr><th>排名</th><th>名稱</th><th>代號</th><th>權重</th><th>權重變化</th><th>排名變化</th><th>股數</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
