@@ -1,0 +1,47 @@
+name: 00981A 每日持股追蹤
+
+on:
+  schedule:
+    # 12:00 UTC = 台灣時間 20:00，週一到週五
+    - cron: "0 12 * * 1-5"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-holdings
+  cancel-in-progress: false
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Fetch holdings, store & notify
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DASHBOARD_URL: ${{ vars.DASHBOARD_URL }}
+        run: python scripts/main.py
+
+      - name: Commit updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain data docs/history.json)" ]; then
+            git add data docs/history.json
+            git commit -m "data: 更新持股 $(date -u +%Y-%m-%d)"
+            git push
+          else
+            echo "無資料變動，略過 commit。"
+          fi
