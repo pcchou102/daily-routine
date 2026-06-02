@@ -25,6 +25,8 @@
     th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align:left; }
     th { color:var(--muted); font-weight:600; position:sticky; top:0; background:var(--card); }
     .up { color:var(--up); } .down { color:var(--down); } .flat { color:var(--muted); }
+    /* 當日操作配色：買進=紅、賣出=綠（僅有操作的股票才上色） */
+    .buy { color:var(--down); } .sell { color:var(--up); }
     .empty { color:var(--muted); padding:12px 0; }
     .chartbox { position:relative; height:380px; }
   </style>
@@ -56,7 +58,7 @@
       <div style="max-height:520px; overflow:auto;">
         <table id="holdingsTable">
           <thead>
-            <tr><th>排名</th><th>名稱</th><th>代號</th><th>權重</th><th>權重變化</th><th>排名變化</th><th>股數</th></tr>
+            <tr><th>排名</th><th>名稱</th><th>代號</th><th>權重</th><th>權重變化</th><th>排名變化</th><th>張數</th></tr>
           </thead>
           <tbody></tbody>
         </table>
