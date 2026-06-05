@@ -20,6 +20,8 @@ concurrency:
 jobs:
   track:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # 提前升 Node.js 24，避免 6/16 強制切換造成中斷
     steps:
       - name: Checkout
         uses: actions/checkout@v4
