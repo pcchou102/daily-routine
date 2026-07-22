@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>00981A 持股追蹤儀表板</title>
+  <title>ETF 持股追蹤儀表板</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <style>
     :root { --bg:#0f1115; --card:#181b22; --fg:#e7e9ee; --muted:#9aa0ad; --up:#2ecc71; --down:#e74c3c; --line:#2a2f3a; }
@@ -33,7 +33,13 @@
 </head>
 <body>
   <header>
-    <h1>📊 00981A 統一台股增長主動式ETF — 持股追蹤</h1>
+    <div class="row" style="justify-content:space-between;">
+      <h1 id="title">📊 持股追蹤</h1>
+      <select id="fundSelect">
+        <option value="981a">00981A 統一台股增長主動式ETF</option>
+        <option value="991a">00991A 復華台灣未來50主動式ETF</option>
+      </select>
+    </div>
     <div class="sub" id="subtitle">載入中…</div>
   </header>
   <main>
