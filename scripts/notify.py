@@ -42,10 +42,18 @@ def build_message(snap: dict, ops: dict) -> str:
         any_change = False
         for rec in ops["added"]:
             any_change = True
-            lines.append(f"🔴 新增：{rec['code']} {rec['name']} ({_fmt_rate(rec['nav_rate'])})")
+            lines.append(
+                f"🔴 新增：{rec['code']} {rec['name']} "
+                f"{_fmt_lots_change(rec['share'])} → {_fmt_lots_total(rec['share'])} "
+                f"(0.00%→{_fmt_rate(rec['nav_rate'])})"
+            )
         for rec in ops["removed"]:
             any_change = True
-            lines.append(f"🟢 移除：{rec['code']} {rec['name']} (原 {_fmt_rate(rec['nav_rate'])})")
+            lines.append(
+                f"🟢 移除：{rec['code']} {rec['name']} "
+                f"{_fmt_lots_change(-(rec['share'] or 0))} → {_fmt_lots_total(0)} "
+                f"({_fmt_rate(rec['nav_rate'])}→0.00%)"
+            )
         for rec in ops["increased"]:
             any_change = True
             lines.append(
