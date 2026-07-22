@@ -5,6 +5,12 @@ const PALETTE = [
   "#1abc9c", "#e67e22", "#ff6b9d", "#7f8c8d", "#46c2cb",
 ];
 
+const FUND_FILES = { "981a": "history.json", "991a": "history_991a.json" };
+const FUND_TITLES = {
+  "981a": "📊 00981A 統一台股增長主動式ETF — 持股追蹤",
+  "991a": "📊 00991A 復華台灣未來50主動式ETF — 持股追蹤",
+};
+
 let DATA = null;          // { fund, series:[{date, summary, holdings:[...]}] }
 let chart = null;
 const selected = new Set();
@@ -21,11 +27,17 @@ function fmtRate(r) {
 }
 
 async function load() {
-  const res = await fetch("history.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("history.json 載入失敗：" + res.status);
+  const fundKey = document.getElementById("fundSelect").value;
+  const file = FUND_FILES[fundKey];
+  document.getElementById("title").textContent = FUND_TITLES[fundKey];
+  document.getElementById("subtitle").textContent = "載入中…";
+
+  const res = await fetch(`${file}?t=${Date.now()}`, { cache: "no-store" });
+  if (!res.ok) throw new Error(file + " 載入失敗：" + res.status);
   DATA = await res.json();
   DATA.series.sort((a, b) => a.date.localeCompare(b.date));
 
+  selected.clear();
   const dates = DATA.series.map((s) => s.date);
   document.getElementById("subtitle").textContent =
     `資料區間 ${dates[0] ?? "—"} ~ ${dates[dates.length - 1] ?? "—"}（共 ${dates.length} 個交易日）`;
@@ -184,6 +196,11 @@ function renderTable() {
 document.getElementById("range").onchange = renderChart;
 document.getElementById("top5").onclick = () => topN(5);
 document.getElementById("clear").onclick = () => { selected.clear(); syncChips(); renderChart(); };
+document.getElementById("fundSelect").onchange = () => {
+  load().catch((e) => {
+    document.getElementById("subtitle").textContent = "載入失敗：" + e.message;
+  });
+};
 
 load().catch((e) => {
   document.getElementById("subtitle").textContent = "載入失敗：" + e.message;
