@@ -1,4 +1,4 @@
-name: 00981A 每日持股追蹤
+name: ETF 每日持股追蹤（00981A / 00991A）
 
 on:
   schedule:
@@ -34,18 +34,26 @@ jobs:
       - name: Install deps
         run: pip install -r requirements.txt
 
-      - name: Fetch holdings, store & notify
+      - name: Fetch 00981A holdings, store & notify
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           DASHBOARD_URL: ${{ vars.DASHBOARD_URL }}
         run: python scripts/main.py
 
+      - name: Fetch 00991A holdings, store & notify
+        if: always()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_991A }}
+          DASHBOARD_URL: ${{ vars.DASHBOARD_URL }}
+        run: python scripts/main_991a.py
+
       - name: Commit updated data
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [ -n "$(git status --porcelain data docs/history.json)" ]; then
-            git add data docs/history.json
+          if [ -n "$(git status --porcelain data docs/history.json docs/history_991a.json)" ]; then
+            git add data docs/history.json docs/history_991a.json
             git commit -m "data: 更新持股 $(date -u +%Y-%m-%d)"
             git push
           else
