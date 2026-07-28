@@ -8,14 +8,23 @@ DASHBOARD_URL = os.environ.get("DASHBOARD_URL", "")
 
 
 def _fmt_lots_change(shares: float | None) -> str:
-    """股數變化 → 張(/1000)，帶正負號與千分位，例如 +1,416張。"""
-    lots = round((shares or 0) / 1000)
+    """股數變化 → 張(/1000)，帶正負號與千分位，例如 +1,416張。
+
+    不足一張者改以股表示（例如 +400股），避免出現無意義的 +0張。
+    """
+    n = shares or 0
+    lots = round(n / 1000)
+    if lots == 0 and n != 0:
+        return f"{round(n):+,d}股"
     return f"{lots:+,d}張"
 
 
 def _fmt_lots_total(shares: float | None) -> str:
-    """當日總股數 → 張，例如 5,441張。"""
-    lots = round((shares or 0) / 1000)
+    """當日總股數 → 張，例如 5,441張；不足一張者以股表示。"""
+    n = shares or 0
+    lots = round(n / 1000)
+    if lots == 0 and n != 0:
+        return f"{round(n):,d}股"
     return f"{lots:,d}張"
 
 

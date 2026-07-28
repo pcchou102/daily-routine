@@ -48,6 +48,8 @@ def compute_operations(snap: dict) -> dict:
         else:
             b = before[code]
             d_share = (h["share"] or 0) - (b["share"] or 0)
+            # 只有完全沒變才算無異動；未滿一張的零股尾差仍要回報，
+            # 由 notify 以「股」為單位顯示（例如 +400股）。
             if d_share == 0:
                 continue
             rec = {
